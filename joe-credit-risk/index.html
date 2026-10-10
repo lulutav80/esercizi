@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Credit Risk Analyst – UBS New York</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef1f6;color:#1f2933;min-height:100vh;display:flex;justify-content:center;padding:24px 14px}
+.card{width:100%;max-width:720px;background:#fff;border-radius:14px;box-shadow:0 6px 24px rgba(20,30,60,.12);padding:28px 24px;align-self:flex-start}
+h1{margin:0 0 4px;font-size:1.35rem;color:#14284b;text-align:center}
+.sub{text-align:center;color:#6b7280;font-size:.9rem;margin-bottom:20px}
+.progress{font-size:.85rem;color:#4b5563;margin-bottom:8px;font-weight:600}
+.bar{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;margin-bottom:20px}
+.bar>div{height:100%;background:#14284b;width:0;transition:width .3s}
+.question{font-size:1.08rem;font-weight:600;line-height:1.45;margin-bottom:16px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:1rem;line-height:1.4;padding:14px 16px;margin:0 0 10px;border:2px solid #d1d5db;border-radius:10px;background:#fff;color:#1f2933;cursor:pointer;transition:background .15s,border-color .15s}
+.opt:hover:not(:disabled){border-color:#14284b;background:#f3f6fb}
+.opt:disabled{cursor:default}
+.opt.correct{background:#d1fae5;border-color:#059669;color:#065f46}
+.opt.wrong{background:#fee2e2;border-color:#dc2626;color:#991b1b}
+.feedback{min-height:1.5em;font-weight:600;margin:6px 0 4px}
+.feedback.ok{color:#059669}.feedback.ko{color:#dc2626}
+.btn{display:block;margin:16px auto 0;background:#14284b;color:#fff;border:none;border-radius:10px;padding:13px 28px;font:inherit;font-size:1rem;font-weight:600;cursor:pointer}
+.btn:hover{background:#0b1a33}
+.hidden{display:none}
+.result{text-align:center}
+.score{font-size:2.6rem;font-weight:700;color:#14284b;margin:10px 0 0}
+.pct{font-size:1.2rem;color:#4b5563;margin-bottom:8px}
+@media (max-width:480px){.card{padding:22px 16px}h1{font-size:1.15rem}}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>Test Credit Risk Analyst – UBS New York</h1>
+<div class="sub">12 domande · 3 opzioni ciascuna</div>
+<section id="quiz">
+<div class="progress" id="progress"></div>
+<div class="bar"><div id="barfill"></div></div>
+<div class="question" id="question"></div>
+<div id="options"></div>
+<div class="feedback" id="feedback"></div>
+<button class="btn hidden" id="next" type="button">Domanda successiva</button>
+</section>
+<section id="result" class="result hidden">
+<div class="progress">Risultato finale</div>
+<div class="score" id="score"></div>
+<div class="pct" id="pct"></div>
+<button class="btn" id="restart" type="button">Ripeti</button>
+</section>
+</main>
+<script>
+var QUESTIONS = [{"n": 1, "q": "Qual è la formula corretta dell’Expected Loss (EL) in credit risk?", "o": [{"k": "a", "t": "PD × LGD × EAD"}, {"k": "b", "t": "PD + LGD + EAD"}, {"k": "c", "t": "PD / LGD × EAD"}], "a": "a"}, {"n": 2, "q": "Nell’Advanced IRB Approach di Basilea, quali parametri stima internamente la banca?", "o": [{"k": "a", "t": "Solo la PD"}, {"k": "b", "t": "PD, LGD ed EAD"}, {"k": "c", "t": "Solo LGD ed EAD"}], "a": "b"}, {"n": 3, "q": "Secondo la definizione di default di Basilea, un debitore è in default se:", "o": [{"k": "a", "t": "È in ritardo di 30 giorni"}, {"k": "b", "t": "È in ritardo di oltre 90 giorni su un’obbligazione materiale OPPURE la banca ritiene improbabile il pagamento integrale senza realizzare collaterale"}, {"k": "c", "t": "È in ritardo di 180 giorni"}], "a": "b"}, {"n": 4, "q": "Cosa rappresenta il LGD (Loss Given Default)?", "o": [{"k": "a", "t": "La probabilità che il debitore vada in default"}, {"k": "b", "t": "La percentuale di perdita sull’esposizione in caso di default (1 – recovery rate)"}, {"k": "c", "t": "L’importo dell’esposizione al momento del default"}], "a": "b"}, {"n": 5, "q": "Un Debt-to-Equity ratio molto elevato indica generalmente:", "o": [{"k": "a", "t": "Bassa leva finanziaria e rischio contenuto"}, {"k": "b", "t": "Elevata leva finanziaria e potenzialmente maggiore credit risk"}, {"k": "c", "t": "Ottima liquidità"}], "a": "b"}, {"n": 6, "q": "Il Credit Conversion Factor (CCF) viene usato principalmente per:", "o": [{"k": "a", "t": "Calcolare la PD"}, {"k": "b", "t": "Stimare l’EAD sulle linee di credito non utilizzate (undrawn commitments)"}, {"k": "c", "t": "Stimare il LGD"}], "a": "b"}, {"n": 7, "q": "L’Unexpected Loss è coperto principalmente da:", "o": [{"k": "a", "t": "Accantonamenti per Expected Loss"}, {"k": "b", "t": "Capitale regolamentare (regulatory capital)"}, {"k": "c", "t": "Solo dagli interessi attivi"}], "a": "b"}, {"n": 8, "q": "I classici “5 C” dell’analisi del credito includono:", "o": [{"k": "a", "t": "Character, Capacity, Capital, Collateral, Conditions"}, {"k": "b", "t": "Credit, Cash, Collateral, Compliance, Cost"}, {"k": "c", "t": "Character, Credit score, Capacity, Collateral, Currency"}], "a": "a"}, {"n": 9, "q": "La Migration Analysis serve principalmente a misurare:", "o": [{"k": "a", "t": "Il rischio di tasso di interesse"}, {"k": "b", "t": "Il rischio di concentrazione creditizia osservando le migrazioni di rating"}, {"k": "c", "t": "Il rischio operativo"}], "a": "b"}, {"n": 10, "q": "Per una revolving credit facility, l’EAD si stima tipicamente come:", "o": [{"k": "a", "t": "Outstanding attuale + CCF × importo non utilizzato"}, {"k": "b", "t": "Solo l’outstanding attuale"}, {"k": "c", "t": "Sempre l’intero importo committed"}], "a": "a"}, {"n": 11, "q": "I rating Point-in-Time (PIT) tendono ad essere:", "o": [{"k": "a", "t": "Più stabili through-the-cycle"}, {"k": "b", "t": "Più prociclici"}, {"k": "c", "t": "Completamente indipendenti dalle condizioni economiche"}], "a": "b"}, {"n": 12, "q": "RAROC significa:", "o": [{"k": "a", "t": "Risk-Adjusted Return on Capital"}, {"k": "b", "t": "Regulatory Adjusted Risk of Credit"}, {"k": "c", "t": "Return on Assets Risk of Capital"}], "a": "a"}];
+var order, idx, score;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function el(id){return document.getElementById(id);}
+function start(){
+  order = QUESTIONS.map(function(q){return {q:q.q,a:q.a,o:shuffle(q.o)};});
+  idx=0;score=0;
+  el('result').classList.add('hidden');el('quiz').classList.remove('hidden');
+  render();
+}
+function render(){
+  var q=order[idx], total=order.length;
+  el('progress').textContent='Domanda '+(idx+1)+' di '+total;
+  el('barfill').style.width=(idx/total*100)+'%';
+  el('question').textContent=(idx+1)+'. '+q.q;
+  el('feedback').textContent='';el('feedback').className='feedback';
+  el('next').classList.add('hidden');
+  el('next').textContent = idx===total-1 ? 'Vedi il risultato' : 'Domanda successiva';
+  var box=el('options');box.innerHTML='';
+  q.o.forEach(function(o){
+    var b=document.createElement('button');
+    b.type='button';b.className='opt';b.textContent=o.t;b.setAttribute('data-k',o.k);
+    b.addEventListener('click',function(){choose(b,o.k);});
+    box.appendChild(b);
+  });
+}
+function choose(btn,k){
+  var q=order[idx];
+  var btns=el('options').querySelectorAll('.opt');
+  btns.forEach(function(b){b.disabled=true;if(b.getAttribute('data-k')===q.a)b.classList.add('correct');});
+  if(k===q.a){score++;el('feedback').textContent='Giusto!';el('feedback').className='feedback ok';}
+  else{btn.classList.add('wrong');el('feedback').textContent='Sbagliato. La risposta corretta è evidenziata in verde.';el('feedback').className='feedback ko';}
+  el('next').classList.remove('hidden');
+}
+el('next').addEventListener('click',function(){
+  idx++;
+  if(idx<order.length){render();}else{finish();}
+});
+function finish(){
+  var total=order.length;
+  el('barfill').style.width='100%';
+  el('quiz').classList.add('hidden');el('result').classList.remove('hidden');
+  el('score').textContent=score+'/'+total;
+  el('pct').textContent=Math.round(score/total*100)+'%';
+}
+el('restart').addEventListener('click',start);
+start();
+</script>
+</body>
+</html>
